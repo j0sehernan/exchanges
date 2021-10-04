@@ -8,6 +8,7 @@ import com.example.exchanges.responses.ExchangeResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
+import rx.schedulers.Schedulers;
 
 @Service
 public class ExchangeService {
@@ -36,11 +37,12 @@ public class ExchangeService {
         return exchangeResponse;
     }
 
-    public Observable<ExchangeTransaction> exchangeObservable(ExchangeResponse exchangeResponse, ExchangeRate exchangeRate) {
+    public void exchangeObservable(ExchangeResponse exchangeResponse, ExchangeRate exchangeRate) {
         ExchangeTransaction exchangeTransaction = new ExchangeTransaction();
         exchangeTransaction.setAmount(exchangeResponse.getAmount());
         exchangeTransaction.setExchangeAmount(exchangeResponse.getExchangeAmount());
         exchangeTransaction.setExchangeRate(exchangeRate);
-        return Observable.just(exchangeTransactionService.create(exchangeTransaction));
+
+        Observable.just(exchangeTransaction).subscribeOn(Schedulers.newThread()).subscribe(et -> exchangeTransactionService.create(et));
     }
 }
