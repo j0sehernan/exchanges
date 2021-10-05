@@ -5,6 +5,8 @@ import com.example.exchanges.entities.ExchangeRate;
 import com.example.exchanges.entities.ExchangeTransaction;
 import com.example.exchanges.requests.ExchangeRequest;
 import com.example.exchanges.responses.ExchangeResponse;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
@@ -18,6 +20,10 @@ public class ExchangeService {
     private CurrencyService currencyService;
     @Autowired
     private ExchangeTransactionService exchangeTransactionService;
+
+    public List<ExchangeResponse> exchangeMassive(List<ExchangeRequest> exchangeRequest) {
+        return exchangeRequest.stream().map(this::exchange).filter(it -> !(it.getOriginCurrency().equals("USD") && it.getDestinationCurrency().equals("PEN"))).collect(Collectors.toList());
+    }
 
     public ExchangeResponse exchange(ExchangeRequest exchangeRequest) {
         ExchangeResponse exchangeResponse = new ExchangeResponse();
